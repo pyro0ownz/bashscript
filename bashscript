@@ -1,0 +1,217 @@
+#!/bin/bash
+##Installer to make directories and scripts. 
+#############################################
+#    Name Date and Class in this box here   #
+#                                           #
+#############################################
+
+
+#directory Check
+##These are variables with directories in it calling the home command pulls the users directory that uses it from the system
+Index="${HOME}/public_html/index.html"
+Public="${HOME}/public_html"
+CIS229="${HOME}/public_html/CIS229"
+Scripts="${HOME}/public_html/CIS229/Scripts"
+Report="${HOME}/public_html/CIS229/Scripts/Report.sh"
+Backup="${HOME}/public_html/CIS229/Scripts/Backup.sh"
+
+##backup section
+backupfolder="${HOME}/public_html/CIS229/backupfolder"
+backupdir="${HOME}/public_html"
+
+#date section 
+#date=`date '+%d%b%Y'`
+
+#webpage section
+
+##These are variables being set by using commands with ` 
+Me=`whoami`
+Host=`hostname`
+date=`date`
+procname=`grep -i "model name" /proc/cpuinfo | tail -1`
+procnum=`grep -ic "model name" /proc/cpuinfo`
+procCores=`grep -i "cpu cores" /proc/cpuinfo | tail -1`
+procMHZ=`grep -i "cpu MHz" /proc/cpuinfo | tail -1`
+mountedpartitions=`df`
+Date=`date '+%d%b%Y'`
+
+#####################################################
+#This script makes the other scripts and directories#
+#It checks for directories if not found creates them#
+#               Only run Once.                      #
+#####################################################
+
+#check for public directory 
+##These are conditional statements that check if the directories above exist if not create them so the rest of the script works
+if [[ -d "$Public" ]]
+then
+    echo "$Public exists on your filesystem."
+		else 
+	       echo "$Public Does not exist. Creating Directory."
+		    mkdir $Public
+fi
+
+##check for CIS directory
+if [[ -d "$CIS229" ]]
+then
+    echo "$CIS229 exists on your filesystem."
+		else 
+	       echo "$CIS229 Does not exist. Creating Directory."
+		    mkdir $CIS229
+fi
+
+###Check for scripts directory 
+if [[ -d "$Scripts" ]]
+then
+    echo "$Scripts exists on your filesystem."
+		else 
+	       echo "$Scripts Does not exist. Creating Directory."
+		     mkdir $Scripts
+fi
+##backup section 
+if [[ -d "$backupfolder" ]]
+then
+    echo "$backupfolder exists on your filesystem."
+		else 
+	       echo "$backupfolder Does not exist. Creating Directory."
+		     mkdir $backupfolder
+fi
+##This conditional is looking for a file if it exists if it doesnt create it
+if [[ -f $Backup ]]
+then
+    echo "This $Backup file exists on your filesystem."
+	  	else 
+	       echo "$Backup file Does not exist. Creating  Backup Script in $Scripts."
+#This section is creating the backup with commands that you usually type in but they are ran in a script to make it faster
+echo "#!/bin/bash" > $Backup
+echo 'backupfolder="${HOME}/public_html/CIS229/backupfolder"'  >> $Backup
+echo 'backupdir="${HOME}/public_html"' >> $Backup
+echo 'date=`date '+%d%b%Y'`' >> $Backup
+echo 'Date=`date`' >> $Backup
+echo 'for i in $backupdir' >> $Backup
+echo "do" >> $Backup
+echo 'tar -czf $backfolder/$i"_"$date.tar.gz *' >> $Backup
+echo 'mv /$i"_"$date.tar.gz $backupfolder' >> $Backup
+echo "done"
+echo 'cd /${HOME}/public_html/CIS229/backupfolder' >> $Backup
+echo 'touch backup.$date.txt' >> $Backup
+echo 'echo "Date Backed up:$Date" >> backup.$date.txt' >> $Backup
+echo "done" >> $Backup
+chmod 777 $Backup
+fi
+####Check for report file same thing here 
+if [[ -f $Report ]]
+then
+    echo "This file exists on your filesystem."
+	  	else 
+	       echo "$Report file Does not exist. Creating  Report Script in $Scripts."
+################################################
+#Scripting section above                       #
+#Report webpage below                          #
+################################################
+
+##here again repetitive stuff where you set the variables with commands and then echo them into a webpage
+###This is our information
+echo '#!/bin/bash' > $Report
+echo 'Index="/${HOME}/public_html/index.html"' >>$Report
+echo 'Me=`whoami`' >>$Report
+echo 'Host=`hostname`' >>$Report 
+echo 'date=`date`' >>$Report 
+echo 'procname=`grep -i "model name" /proc/cpuinfo | tail -1`' >>$Report
+echo 'procnum=`grep -ic "model name" /proc/cpuinfo`' >> $Report
+echo 'procCores=`grep -i "cpu cores" /proc/cpuinfo | tail -1`' >>$Report
+echo 'procMHZ=`grep -i "cpu MHz" /proc/cpuinfo | tail -1`' >>$Report
+echo 'mountedpartitions=`df`' >> $Report
+echo 'Date=`date '+%d%b%Y'`' >> $Report
+
+###this section builds the webpage by echoing the information we got from up above and sticking it in the page code with an echo
+
+#Doc type
+echo 'echo "<!DOCTYPE html>" > $Index' >> $Report
+echo 'echo "<html>" >> $Index' >> $Report
+#head
+
+echo 'echo "<head>" >> $Index'  >>$Report
+echo 'echo "<title>`hostname`</title>" >> $Index' >>$Report
+echo 'echo "</head>" >>$Index' >>$Report
+
+#body
+echo 'echo "<body>" >> $Index' >>$Report
+echo 'echo "<hr>" >>$Index' >>$Report
+echo 'echo "<center><h1> $Me CIS229 Project </h1></center>" >>$Index' >> $Report
+echo 'echo "<center><h1>Log Information</h1></center>" >> $Index' >> $Report
+echo 'echo "<center><p>Date Log made was $date</p></center>" >>$Index'>> $Report
+echo 'echo "<hr>" >> $Index' >> $Report
+
+##Disk information
+
+echo 'echo "<center><h3>Disk Information</h3></center>" >>$Index' >>$Report
+echo 'echo "<hr>" >>$Index' >>$Report
+echo 'echo "<p>Mounted Partitions:</p>" >>$Index' >>$Report
+echo 'echo "<pre>Disk mount info:<br>`df -h`</pre>" >>$Index' >> $Report
+echo 'echo "<hr>" >> $Index' >> $Report
+
+#processor information
+
+echo 'echo "<center><h3>Processor Section</h3></center>">>$Index' >>$Report
+echo 'echo "<hr>">>$Index' >> $Report
+#echo "<center><p>Processor $procname</p></center>" >>$Report
+#echo "<center><p>Number of processors:$procnum</p></center>" >>$Report
+#echo "<center><p>Number $procCores</p></center>" >>$Report
+#echo "<center><p>Processor speed:$procMHZ</p></center>" >>$Report
+echo 'echo "<pre>`lscpu`</pre>">>$Index' >> $Report
+#while read line; do echo $line '<br>' >> $Report; done </proc/cpuinfo
+echo 'echo "<hr>">>$Index' >> $Report
+
+#ram information
+
+echo 'echo "<center><h3>Ram usage section</h3></center>" >>$Index'>> $Report
+echo 'echo "<hr>">>$Index' >>$Report
+echo 'echo "<pre>Ram usage: <br> `free -h`</pre>" >>$Index'>>$Report
+echo 'echo "<p>`grep -i "memtotal" /proc/meminfo`<p>">>$Index' >> $Report
+echo 'echo "</body>" >>$Index'>> $Report
+echo 'echo "<hr>">>$Index' >> $Report
+echo 'echo "<center><h3>Users logged in</h3></center>" >>$Index'>> $Report
+echo 'echo "<hr>">>$Index'>> $Report
+
+#username list
+echo "cat /etc/passwd | cut -d: -f 1 | while read line;" >>$Report
+echo "do" >>$Report
+echo 'if last | grep $line; then' >>$Report
+echo 'echo "<pre>`last | grep  $line`<br></pre>" >>$Index' >>$Report
+echo "else">>$Report 
+echo 'echo "<pre>no record in last:$line<br></pre>" >>$Index' >>$Report
+echo  "fi" >>$Report 
+echo "done">>$Report
+
+echo 'echo "<hr>" >>$Index'>>$Report
+
+#Call backup script inside of the report script
+echo '${HOME}/public_html/CIS229/Scripts/Backup.sh' >> $Report 
+#footer 
+echo 'echo "<footer>">>$Index' >>$Report
+echo 'echo "<hr>" >>$Index'>> $Report
+echo 'echo "<center><p>This script was made by $Me.</p></center>" >>$Index'>>$Report
+echo 'echo "<center><p>Date Last back up: $date</p></center>" >>$Index'>>$Report
+echo 'echo "<center><a href="mailto:$Me@hawkmail.hfcc.edu">Send Email</a></center>" >>$Index' >>$Report
+echo 'echo "<hr>" >>$Index'>> $Report
+echo 'echo "</footer>" >>$Index'>>$Report
+echo 'echo "</html>">>$Index' >>$Report
+echo 'chmod 644 $Index' >> $Report
+fi
+
+###Cron tab and permissions 
+####This is where your cron tab is and all your permissions We had to set the report script to executable 777 and then we make the cron file and push it 
+###inside of the cron file we have no permissions to directly edit the file because the college stuff is there too
+chmod 777 $Report
+echo "0 6 * * 1-5 "${HOME}/public_html/CIS229/Scripts/Report.sh"" > CronEntry
+echo "0 7 * * 6-7 "${HOME}/public_html/CIS229/Scripts/Report.sh"" >> CronEntry
+crontab < CronEntry
+crontab -l > $Scripts/Crontab.txt
+rm CronEntry
+##The above creates a temp file and then pushes it into the cron entry and then removes the temp file
+###The below code calls the report script after installation so your webpage reports. 
+./public_html/CIS229/Scripts/Report.sh &>/dev/null
+###Exits with a done so that you know the script exited successfully 
+exit 0
+
